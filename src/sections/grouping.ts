@@ -60,7 +60,9 @@ export class Grouping extends LitElement {
                 </div>
                 <div class="speaker-controls">
                   <button
-                    class="mute-btn${item.player.isMemberMuted() ? ' muted' : ''}"
+                    class="mute-btn${item.player.isMemberMuted() ? ' muted' : ''}${!item.isSelected
+                      ? ' not-grouped'
+                      : ''}"
                     @click=${() => this.mutePlayer(item)}
                     aria-label="Mute"
                   >
@@ -69,7 +71,7 @@ export class Grouping extends LitElement {
                     </svg>
                   </button>
                   <button
-                    class="group-btn"
+                    class="group-btn${!item.isSelected ? ' not-grouped' : ''}"
                     @click=${() => this.toggleItem(item)}
                     ?selected=${item.isSelected}
                     aria-label="Group"
@@ -194,6 +196,10 @@ export class Grouping extends LitElement {
             background 0.2s,
             color 0.2s;
         }
+        .mute-btn.not-grouped {
+          background: #444 !important;
+          color: #bbb !important;
+        }
         .mute-btn.muted {
           background: #b48aff;
           color: #23242a;
@@ -214,6 +220,10 @@ export class Grouping extends LitElement {
           transition:
             background 0.2s,
             color 0.2s;
+        }
+        .group-btn.not-grouped {
+          background: #444 !important;
+          color: #bbb !important;
         }
         .group-btn:hover {
           background: #35363c;
