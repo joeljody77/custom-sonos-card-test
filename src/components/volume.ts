@@ -285,7 +285,6 @@ class SonosSimpleVerticalSlider extends LitElement {
   private resizeObserver?: ResizeObserver;
 
   private dragging = false;
-  private touchDragging = false;
 
   private get percent() {
     return Math.max(0, Math.min(1, this.value / this.max));
@@ -300,20 +299,11 @@ class SonosSimpleVerticalSlider extends LitElement {
     if (track) {
       this.resizeObserver.observe(track);
     }
-    // Touch event listeners for mobile support
-    const thumb = this.renderRoot.querySelector('.slider-thumb');
-    if (thumb) {
-      thumb.addEventListener('touchstart', this.onThumbTouchStart, { passive: false });
-    }
   }
 
   disconnectedCallback() {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
-    }
-    const thumb = this.renderRoot.querySelector('.slider-thumb');
-    if (thumb) {
-      thumb.removeEventListener('touchstart', this.onThumbTouchStart);
     }
     super.disconnectedCallback();
   }
@@ -346,44 +336,6 @@ class SonosSimpleVerticalSlider extends LitElement {
     window.addEventListener('mouseup', this.onMouseUp);
     e.preventDefault();
   }
-
-  private onThumbTouchStart = (e: TouchEvent) => {
-    if (this.disabled) return;
-    this.touchDragging = true;
-    window.addEventListener('touchmove', this.onTouchMove, { passive: false });
-    window.addEventListener('touchend', this.onTouchEnd, { passive: false });
-    e.preventDefault();
-  };
-
-  private onTouchMove = (e: TouchEvent) => {
-    if (!this.touchDragging) return;
-    const track = this.renderRoot.querySelector('.slider-track') as HTMLElement;
-    const rect = track.getBoundingClientRect();
-    const touch = e.touches[0];
-    const y = touch.clientY - rect.top;
-    let percent = 1 - y / rect.height;
-    percent = Math.max(0, Math.min(1, percent));
-    this.value = Math.round(percent * this.max);
-    this.emitChange();
-    e.preventDefault();
-  };
-
-  private onTouchEnd = (e: TouchEvent) => {
-    if (this.touchDragging) {
-      const track = this.renderRoot.querySelector('.slider-track') as HTMLElement;
-      const rect = track.getBoundingClientRect();
-      const touch = e.changedTouches[0];
-      const y = touch.clientY - rect.top;
-      let percent = 1 - y / rect.height;
-      percent = Math.max(0, Math.min(1, percent));
-      this.value = Math.round(percent * this.max);
-      this.emitChange();
-    }
-    this.touchDragging = false;
-    window.removeEventListener('touchmove', this.onTouchMove);
-    window.removeEventListener('touchend', this.onTouchEnd);
-    e.preventDefault();
-  };
 
   private onMouseMove = (e: MouseEvent) => {
     if (!this.dragging) return;
@@ -558,7 +510,6 @@ class SonosSimpleVerticalSlider extends LitElement {
           transform 0.15s;
         backdrop-filter: blur(1.5px) saturate(1.2);
         -webkit-backdrop-filter: blur(1.5px) saturate(1.2);
-        touch-action: none;
       }
       .slider-thumb::before {
         content: '';
