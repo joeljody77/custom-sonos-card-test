@@ -367,7 +367,10 @@ class SonosSimpleVerticalSlider extends LitElement {
           <div
             class="slider-thumb"
             style="bottom: ${thumbY}%;"
-            @mousedown=${this.onThumbMouseDown}
+            @mousedown=${(e: MouseEvent) => {
+              e.stopPropagation();
+              this.onThumbMouseDown(e);
+            }}
             tabindex="0"
             role="slider"
             aria-valuenow="${this.value}"
