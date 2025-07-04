@@ -328,7 +328,7 @@ class SonosSimpleVerticalSlider extends LitElement {
 
   render() {
     const ticks = Array.from({ length: this.tickCount + 1 }, (_, i) => i);
-    const thumbY = (1 - this.percent) * 100;
+    const thumbY = this.percent * 100;
     return html`
       <div class="slider-outer">
         <div class="slider-track" @click=${this.onTrackClick}>
@@ -337,7 +337,7 @@ class SonosSimpleVerticalSlider extends LitElement {
             const tickY = tickPercent * 100;
             // Gradient: blue at low, purple at high
             const color = `linear-gradient(90deg, #4f5bd5 ${(tickPercent * 100).toFixed(0)}%, #b48aff 100%)`;
-            const active = tickPercent <= this.percent;
+            const active = tickPercent >= this.percent;
             return html`<div
               class="slider-tick"
               style="bottom: ${tickY}%; background: ${active ? color : '#23242a'}; opacity: ${active ? 1 : 0.4};"
