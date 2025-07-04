@@ -58,7 +58,11 @@ export class Grouping extends LitElement {
                   ></sonos-simple-vertical-slider>
                 </div>
                 <div class="speaker-controls">
-                  <button class="mute-btn" @click=${() => this.mutePlayer(item)} aria-label="Mute">
+                  <button
+                    class="mute-btn${item.player.isMemberMuted() ? ' muted' : ''}"
+                    @click=${() => this.mutePlayer(item)}
+                    aria-label="Mute"
+                  >
                     <svg viewBox="0 0 24 24" width="24" height="24">
                       <path d="${mdiVolumeOff}" fill="currentColor" />
                     </svg>
@@ -172,7 +176,27 @@ export class Grouping extends LitElement {
           margin-bottom: 0.5rem;
           justify-content: center;
         }
-        .mute-btn,
+        .mute-btn {
+          background: #23242a;
+          border: none;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #b48aff;
+          font-size: 1.3rem;
+          box-shadow: 0 2px 6px #0003;
+          cursor: pointer;
+          transition:
+            background 0.2s,
+            color 0.2s;
+        }
+        .mute-btn.muted {
+          background: #b48aff;
+          color: #23242a;
+        }
         .group-btn {
           background: #23242a;
           border: none;
@@ -190,7 +214,6 @@ export class Grouping extends LitElement {
             background 0.2s,
             color 0.2s;
         }
-        .mute-btn:hover,
         .group-btn:hover {
           background: #35363c;
         }
