@@ -36,44 +36,37 @@ export class Grouping extends LitElement {
     }
 
     return html`
-      <div class="wrapper">
-        <div class="predefined-groups">
-          ${this.renderJoinAllButton()} ${this.renderUnJoinAllButton()}
-          ${when(this.store.predefinedGroups, () => this.renderPredefinedGroups())}
+      <div class="grouping-vertical-wrapper">
+        <div class="grouping-header-buttons">
+          <button class="group-all-btn" @click=${this.selectAll}>GROUP ALL</button>
+          <button class="ungroup-all-btn" @click=${this.deSelectAll}>UNGROUP ALL</button>
         </div>
-        <div class="list">
-          ${this.groupingItems.map((item) => {
-            return html`
-              <div class="item" modified=${item.isModified || nothing} disabled=${item.isDisabled || nothing}>
-                <ha-icon
-                  class="icon"
-                  selected=${item.isSelected || nothing}
-                  .icon="mdi:${item.icon}"
-                  @click=${() => this.toggleItem(item)}
-                ></ha-icon>
-                <div class="name-and-volume">
-                  <span class="name">${item.name}</span>
-                  <sonos-volume
-                    class="volume"
-                    .store=${this.store}
-                    .player=${item.player}
-                    .updateMembers=${false}
-                    .slim=${true}
-                  ></sonos-volume>
-                </div>
+        <div class="grouping-speaker-columns">
+          ${this.groupingItems.map((item) => html`
+            <div class="speaker-column" ?disabled=${item.isDisabled}>
+              <div class="vertical-slider-wrapper">
+                <sonos-volume
+                  class="vertical-volume"
+                  .store=${this.store}
+                  .player=${item.player}
+                  .updateMembers=${false}
+                  .slim=${true}
+                  orientation="vertical"
+                ></sonos-volume>
+                <!-- Placeholder for colored tick marks and dynamic color effects -->
               </div>
-            `;
-          })}
+              <div class="speaker-controls">
+                <button class="mute-btn" @click=${() => this.mutePlayer(item)}>
+                  <ha-icon .icon="mdi:volume-mute"></ha-icon>
+                </button>
+                <button class="group-btn" @click=${() => this.toggleItem(item)} ?selected=${item.isSelected}>
+                  <ha-icon .icon="mdi:account-multiple"></ha-icon>
+                </button>
+              </div>
+              <div class="speaker-name">${item.name}</div>
+            </div>
+          `)}
         </div>
-        <ha-control-button-group
-          class="buttons"
-          hide=${(this.modifiedItems.length === 0 && !this.selectedPredefinedGroup) ||
-          this.config.skipApplyButtonWhenGrouping ||
-          nothing}
-        >
-          <ha-control-button class="apply" @click=${this.applyGrouping}> Apply</ha-control-button>
-          <ha-control-button @click=${this.cancelGrouping}> Cancel</ha-control-button>
-        </ha-control-button-group>
       </div>
     `;
   }
@@ -82,76 +75,102 @@ export class Grouping extends LitElement {
     return [
       listStyle,
       css`
-        :host {
-          --mdc-icon-size: 24px;
-        }
-        .wrapper {
+        .grouping-vertical-wrapper {
           display: flex;
           flex-direction: column;
+          align-items: center;
           height: 100%;
+          background: #18191c;
+          border-radius: 12px;
+          padding: 1rem;
         }
-
-        .predefined-groups {
-          margin: 1rem;
+        .grouping-header-buttons {
           display: flex;
-          flex-wrap: wrap;
           gap: 1rem;
-          justify-content: center;
-          flex-shrink: 0;
+          margin-bottom: 1.5rem;
         }
-
-        .item {
-          color: var(--secondary-text-color);
-          padding: 0.5rem;
+        .group-all-btn, .ungroup-all-btn {
+          background: #23242a;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          padding: 0.5rem 1.2rem;
+          font-weight: bold;
+          font-size: 1rem;
+          box-shadow: 0 2px 6px #0004;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .group-all-btn:hover, .ungroup-all-btn:hover {
+          background: #35363c;
+        }
+        .grouping-speaker-columns {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: flex-end;
+          gap: 2.5rem;
+          width: 100%;
+        }
+        .speaker-column {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          background: none;
+          min-width: 70px;
+        }
+        .vertical-slider-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          height: 160px;
+          margin-bottom: 1rem;
+        }
+        .vertical-volume {
+          /* Placeholder for vertical slider styling */
+          writing-mode: bt-lr;
+          transform: rotate(-90deg);
+          height: 140px;
+          width: 32px;
+        }
+        .speaker-controls {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+        .mute-btn, .group-btn {
+          background: #23242a;
+          border: none;
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
           display: flex;
           align-items: center;
+          justify-content: center;
+          color: #b48aff;
+          font-size: 1.3rem;
+          box-shadow: 0 2px 6px #0003;
+          cursor: pointer;
+          transition: background 0.2s, color 0.2s;
         }
-
-        .icon {
-          padding-right: 0.5rem;
-          flex-shrink: 0;
+        .mute-btn:hover, .group-btn:hover {
+          background: #35363c;
         }
-
-        .icon[selected] {
-          color: var(--accent-color);
+        .group-btn[selected] {
+          background: #b48aff;
+          color: #23242a;
         }
-
-        .item[modified] .name {
-          font-weight: bold;
-          font-style: italic;
+        .speaker-name {
+          margin-top: 0.3rem;
+          color: #fff;
+          font-size: 1rem;
+          text-align: center;
+          font-weight: 500;
+          letter-spacing: 0.01em;
         }
-
-        .item[disabled] .icon {
-          color: var(--disabled-text-color);
-        }
-
-        .list {
-          flex: 1;
-          overflow: auto;
-        }
-
-        .buttons {
-          flex-shrink: 0;
-          margin: 0 1rem;
-          padding-top: 0.5rem;
-        }
-
-        .apply {
-          --control-button-background-color: var(--accent-color);
-        }
-
-        *[hide] {
-          display: none;
-        }
-
-        .name-and-volume {
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-        }
-
-        .volume {
-          --accent-color: var(--secondary-text-color);
+        .speaker-column[disabled] {
+          opacity: 0.5;
+          pointer-events: none;
         }
       `,
     ];
@@ -285,5 +304,10 @@ export class Grouping extends LitElement {
         this.toggleItem(item);
       }
     });
+  }
+
+  mutePlayer(item: GroupingItem) {
+    if (item.isDisabled) return;
+    this.mediaControlService.toggleMute(item.player, false);
   }
 }
