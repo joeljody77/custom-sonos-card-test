@@ -260,33 +260,44 @@ export class Card extends LitElement {
   }
 
   static get styles() {
-    return css`
-      :host {
+    return [
+      css`
+        :host {
+          height: 100%;
+          width: 100%;
+          display: block;
+        }
+        .card-content {
+          height: 100%;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+        }
         --mdc-icon-button-size: 3rem;
         --mdc-icon-size: 2rem;
-      }
-      ha-circular-progress {
-        --md-sys-color-primary: var(--accent-color);
-      }
-      .loader {
-        position: absolute;
-        z-index: 1000;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        --mdc-theme-primary: var(--accent-color);
-      }
-      .title {
-        margin: 0.4rem 0;
-        text-align: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-        color: var(--secondary-text-color);
-      }
-      .no-players {
-        text-align: center;
-        margin-top: 50%;
-      }
-    `;
+        ha-circular-progress {
+          --md-sys-color-primary: var(--accent-color);
+        }
+        .loader {
+          position: absolute;
+          z-index: 1000;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          --mdc-theme-primary: var(--accent-color);
+        }
+        .title {
+          margin: 0.4rem 0;
+          text-align: center;
+          font-weight: bold;
+          font-size: 1.2rem;
+          color: var(--secondary-text-color);
+        }
+        .no-players {
+          text-align: center;
+          margin-top: 50%;
+        }
+      `,
+    ];
   }
 }
