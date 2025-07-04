@@ -119,7 +119,7 @@ export class Grouping extends LitElement {
           flex-direction: row;
           justify-content: center;
           align-items: flex-end;
-          gap: 2.5rem;
+          gap: 1.5rem;
           width: 100%;
           height: 100%;
         }
@@ -128,7 +128,9 @@ export class Grouping extends LitElement {
           flex-direction: column;
           align-items: center;
           justify-content: flex-end;
-          min-width: 70px;
+          flex: 1 1 0;
+          min-width: 0;
+          max-width: 100%;
           background: none;
         }
         .vertical-slider-wrapper {
