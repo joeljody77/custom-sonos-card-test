@@ -9,6 +9,7 @@ import { MediaPlayer } from '../model/media-player';
 import '../components/grouping-button';
 import { CardConfig, PredefinedGroup, PredefinedGroupPlayer } from '../types';
 import { GroupingItem } from '../model/grouping-item';
+import { mdiVolumeOff, mdiAccountGroup } from '@mdi/js';
 
 export class Grouping extends LitElement {
   @property({ attribute: false }) store!: Store;
@@ -58,7 +59,9 @@ export class Grouping extends LitElement {
                 </div>
                 <div class="speaker-controls">
                   <button class="mute-btn" @click=${() => this.mutePlayer(item)} aria-label="Mute">
-                    <ha-icon .icon="mdi:volume-off"></ha-icon>
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                      <path d="${mdiVolumeOff}" fill="currentColor" />
+                    </svg>
                   </button>
                   <button
                     class="group-btn"
@@ -66,7 +69,9 @@ export class Grouping extends LitElement {
                     ?selected=${item.isSelected}
                     aria-label="Group"
                   >
-                    <ha-icon .icon="mdi:account-group"></ha-icon>
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                      <path d="${mdiAccountGroup}" fill="currentColor" />
+                    </svg>
                   </button>
                 </div>
                 <div class="speaker-name">${item.name}</div>
