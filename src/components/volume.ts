@@ -285,6 +285,7 @@ class SonosSimpleVerticalSlider extends LitElement {
   private resizeObserver?: ResizeObserver;
 
   private dragging = false;
+  private touchDragging = false;
 
   private get percent() {
     return Math.max(0, Math.min(1, this.value / this.max));
@@ -363,6 +364,45 @@ class SonosSimpleVerticalSlider extends LitElement {
     window.removeEventListener('mouseup', this.onMouseUp);
   };
 
+  private onThumbTouchStart(e: TouchEvent) {
+    if (this.disabled) return;
+    this.touchDragging = true;
+    window.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    window.addEventListener('touchend', this.onTouchEnd);
+    e.preventDefault();
+  }
+
+  private onTouchMove = (e: TouchEvent) => {
+    if (!this.touchDragging) return;
+    const track = this.renderRoot.querySelector('.slider-track') as HTMLElement;
+    const rect = track.getBoundingClientRect();
+    const touch = e.touches[0];
+    const y = touch.clientY - rect.top;
+    let percent = 1 - y / rect.height;
+    percent = Math.max(0, Math.min(1, percent));
+    this.value = Math.round(percent * this.max);
+    this.emitChange();
+    e.preventDefault();
+  };
+
+  private onTouchEnd = (e: TouchEvent) => {
+    if (this.touchDragging) {
+      const track = this.renderRoot.querySelector('.slider-track') as HTMLElement;
+      const rect = track.getBoundingClientRect();
+      const touch = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]);
+      if (touch) {
+        const y = touch.clientY - rect.top;
+        let percent = 1 - y / rect.height;
+        percent = Math.max(0, Math.min(1, percent));
+        this.value = Math.round(percent * this.max);
+        this.emitChange();
+      }
+    }
+    this.touchDragging = false;
+    window.removeEventListener('touchmove', this.onTouchMove);
+    window.removeEventListener('touchend', this.onTouchEnd);
+  };
+
   private emitChange() {
     this.dispatchEvent(new CustomEvent('value-changed', { detail: { value: this.value } }));
   }
@@ -419,6 +459,10 @@ class SonosSimpleVerticalSlider extends LitElement {
             @mousedown=${(e: MouseEvent) => {
               e.stopPropagation();
               this.onThumbMouseDown(e);
+            }}
+            @touchstart=${(e: TouchEvent) => {
+              e.stopPropagation();
+              this.onThumbTouchStart(e);
             }}
             tabindex="0"
             role="slider"

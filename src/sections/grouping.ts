@@ -36,9 +36,9 @@ export class Grouping extends LitElement {
       'media_player.office_2', // office
     ];
     this.groupingItems = customOrder
-      .map(id => this.store.allMediaPlayers.find(player => player.id === id))
+      .map((id) => this.store.allMediaPlayers.find((player) => player.id === id))
       .filter(Boolean)
-      .map(player => new GroupingItem(player!, this.activePlayer, this.modifiedItems.includes(player!.id)));
+      .map((player) => new GroupingItem(player!, this.activePlayer, this.modifiedItems.includes(player!.id)));
     this.notJoinedPlayers = this.getNotJoinedPlayers();
     this.joinedPlayers = this.getJoinedPlayers();
 
