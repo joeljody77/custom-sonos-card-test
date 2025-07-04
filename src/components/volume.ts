@@ -316,7 +316,16 @@ class SonosSimpleVerticalSlider extends LitElement {
     this.emitChange();
   };
 
-  private onMouseUp = () => {
+  private onMouseUp = (e: MouseEvent) => {
+    if (this.dragging) {
+      const track = this.renderRoot.querySelector('.slider-track') as HTMLElement;
+      const rect = track.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      let percent = 1 - y / rect.height;
+      percent = Math.max(0, Math.min(1, percent));
+      this.value = Math.round(percent * this.max);
+      this.emitChange();
+    }
     this.dragging = false;
     window.removeEventListener('mousemove', this.onMouseMove);
     window.removeEventListener('mouseup', this.onMouseUp);
