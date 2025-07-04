@@ -402,7 +402,9 @@ class SonosSimpleVerticalSlider extends LitElement {
         max-height: none;
         background: #111216;
         border-radius: 24px;
-        box-shadow: 0 2px 12px #000a inset, 0 0 8px #000a;
+        box-shadow:
+          0 2px 12px #000a inset,
+          0 0 8px #000a;
         margin: 0 auto;
         cursor: pointer;
         display: flex;
@@ -424,8 +426,8 @@ class SonosSimpleVerticalSlider extends LitElement {
         position: absolute;
         left: 50%;
         transform: translate(-50%, 0);
-        width: 48px;
-        height: 36px;
+        width: 96px;
+        height: 72px;
         background: linear-gradient(180deg, #e0e0e0 0%, #bdbdbd 40%, #888 60%, #444 100%);
         border-radius: 8px;
         box-shadow:
@@ -443,10 +445,10 @@ class SonosSimpleVerticalSlider extends LitElement {
         content: '';
         display: block;
         position: absolute;
-        left: 8px;
-        right: 8px;
-        top: 16px;
-        height: 2px;
+        left: 16px;
+        right: 16px;
+        top: 32px;
+        height: 4px;
         background: linear-gradient(90deg, #fff 0%, #bbb 100%);
         opacity: 0.7;
         border-radius: 1px;
