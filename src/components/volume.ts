@@ -208,6 +208,12 @@ class SonosVerticalSlider extends LitElement {
         direction: rtl;
         width: 32px;
         height: 120px;
+        min-width: 32px;
+        min-height: 120px;
+        max-width: 32px;
+        max-height: 120px;
+        display: block;
+        margin: 0 auto;
         background: linear-gradient(180deg, #4f5bd5 0%, #b48aff 100%);
         border-radius: 8px;
         outline: none;
