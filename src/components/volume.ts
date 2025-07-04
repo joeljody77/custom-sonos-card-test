@@ -26,14 +26,15 @@ class Volume extends LitElement {
     const max = this.getMax(volume);
     const disabled = this.player.ignoreVolume;
 
-    // Use nouislider-based vertical slider for all usages
+    // Use the custom pure CSS/HTML vertical slider for all usages
     return html`
-      <sonos-noui-vertical-slider
+      <sonos-simple-vertical-slider
         .value=${volume}
         .max=${max}
         .disabled=${disabled}
+        .tickCount=${12}
         @value-changed=${this.volumeChanged}
-      ></sonos-noui-vertical-slider>
+      ></sonos-simple-vertical-slider>
     `;
   }
 
@@ -122,9 +123,13 @@ class SonosNoUiVerticalSlider extends LitElement {
   private sliderEl?: HTMLDivElement;
   private slider?: noUiSlider.API;
 
+  createRenderRoot() {
+    return this;
+  }
+
   firstUpdated() {
     console.log('SonosNoUiVerticalSlider firstUpdated');
-    this.sliderEl = this.renderRoot.querySelector('.noui-vertical-slider') as HTMLDivElement;
+    this.sliderEl = this.querySelector('.noui-vertical-slider') as HTMLDivElement;
     if (this.sliderEl) {
       console.log('Slider container found:', this.sliderEl);
       this.slider = noUiSlider.create(this.sliderEl, {
@@ -139,6 +144,10 @@ class SonosNoUiVerticalSlider extends LitElement {
         connect: [true, false],
         tooltips: false,
       });
+      setTimeout(() => {
+        console.log('Slider classList:', this.sliderEl?.classList.value);
+        console.log('Slider height:', this.sliderEl?.offsetHeight, 'width:', this.sliderEl?.offsetWidth);
+      }, 500);
       this.slider.on('update', (values) => {
         const newValue = Math.round(Number(values[0]));
         if (newValue !== this.value) {
@@ -266,9 +275,162 @@ class SonosNoUiVerticalSlider extends LitElement {
   }
 }
 
+class SonosSimpleVerticalSlider extends LitElement {
+  @property({ type: Number }) value = 50;
+  @property({ type: Number }) max = 100;
+  @property({ type: Boolean }) disabled = false;
+  @property({ type: Number }) tickCount = 10;
+
+  private dragging = false;
+
+  private get percent() {
+    return Math.max(0, Math.min(1, this.value / this.max));
+  }
+
+  private onTrackClick(e: MouseEvent) {
+    if (this.disabled) return;
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const percent = 1 - y / rect.height;
+    const newValue = Math.round(percent * this.max);
+    this.value = newValue;
+    this.emitChange();
+  }
+
+  private onThumbMouseDown(e: MouseEvent) {
+    if (this.disabled) return;
+    this.dragging = true;
+    window.addEventListener('mousemove', this.onMouseMove);
+    window.addEventListener('mouseup', this.onMouseUp);
+    e.preventDefault();
+  }
+
+  private onMouseMove = (e: MouseEvent) => {
+    if (!this.dragging) return;
+    const track = this.renderRoot.querySelector('.slider-track') as HTMLElement;
+    const rect = track.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    let percent = 1 - y / rect.height;
+    percent = Math.max(0, Math.min(1, percent));
+    this.value = Math.round(percent * this.max);
+    this.emitChange();
+  };
+
+  private onMouseUp = () => {
+    this.dragging = false;
+    window.removeEventListener('mousemove', this.onMouseMove);
+    window.removeEventListener('mouseup', this.onMouseUp);
+  };
+
+  private emitChange() {
+    this.dispatchEvent(new CustomEvent('value-changed', { detail: { value: this.value } }));
+  }
+
+  render() {
+    const ticks = Array.from({ length: this.tickCount + 1 }, (_, i) => i);
+    const thumbY = (1 - this.percent) * 100;
+    return html`
+      <div class="slider-outer">
+        <div class="slider-track" @click=${this.onTrackClick}>
+          ${ticks.map((i) => {
+            const tickPercent = i / this.tickCount;
+            const tickY = tickPercent * 100;
+            // Gradient: blue at low, purple at high
+            const color = `linear-gradient(90deg, #4f5bd5 ${(tickPercent * 100).toFixed(0)}%, #b48aff 100%)`;
+            const active = tickPercent <= this.percent;
+            return html`<div
+              class="slider-tick"
+              style="bottom: ${tickY}%; background: ${active ? color : '#23242a'}; opacity: ${active ? 1 : 0.4};"
+            ></div>`;
+          })}
+          <div
+            class="slider-thumb"
+            style="bottom: ${thumbY}%;"
+            @mousedown=${this.onThumbMouseDown}
+            tabindex="0"
+            role="slider"
+            aria-valuenow="${this.value}"
+            aria-valuemax="${this.max}"
+            aria-valuemin="0"
+            aria-disabled="${this.disabled}"
+          ></div>
+        </div>
+      </div>
+    `;
+  }
+
+  static get styles() {
+    return css`
+      .slider-outer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 160px;
+        width: 48px;
+        justify-content: flex-end;
+      }
+      .slider-track {
+        position: relative;
+        width: 12px;
+        height: 140px;
+        background: #18191c;
+        border-radius: 8px;
+        box-shadow: 0 0 8px #000a;
+        margin: 0 auto;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .slider-tick {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        border-radius: 1px;
+        transition:
+          background 0.2s,
+          opacity 0.2s;
+        z-index: 1;
+      }
+      .slider-thumb {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, 0);
+        width: 32px;
+        height: 18px;
+        background: linear-gradient(180deg, #e0e0e0 0%, #888 100%);
+        border-radius: 4px;
+        box-shadow:
+          0 2px 8px #000a,
+          0 0 0 2px #23242a;
+        border: 2px solid #444;
+        z-index: 2;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: box-shadow 0.2s;
+      }
+      .slider-thumb:active {
+        box-shadow:
+          0 4px 16px #000c,
+          0 0 0 2px #b48aff;
+        background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+      }
+      .slider-track:active .slider-thumb {
+        box-shadow:
+          0 4px 16px #000c,
+          0 0 0 2px #b48aff;
+      }
+    `;
+  }
+}
+
 function numberFromEvent(e: Event) {
   return Number.parseInt((e?.target as HTMLInputElement)?.value);
 }
 
 customElements.define('sonos-volume', Volume);
 customElements.define('sonos-noui-vertical-slider', SonosNoUiVerticalSlider);
+customElements.define('sonos-simple-vertical-slider', SonosSimpleVerticalSlider);
