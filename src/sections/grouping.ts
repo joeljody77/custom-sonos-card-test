@@ -77,20 +77,43 @@ export class Grouping extends LitElement {
     return [
       listStyle,
       css`
-        :host {
+        :host,
+        .grouping-vertical-wrapper,
+        .grouping-speaker-columns {
           height: 100%;
           width: 100%;
-          display: block;
+          min-width: 0;
+          min-height: 0;
+          max-width: 100%;
+          max-height: 100%;
+          overflow: hidden;
+          box-sizing: border-box;
         }
-        .grouping-vertical-wrapper {
+        .grouping-speaker-columns {
+          display: flex;
+          flex-direction: row;
+          justify-content: stretch;
+          align-items: flex-end;
+          gap: 1.5rem;
+          width: 100%;
+          height: 100%;
+        }
+        .speaker-column {
+          flex: 1 1 0;
+          min-width: 0;
+          max-width: 100%;
           display: flex;
           flex-direction: column;
           align-items: center;
-          height: 100%;
+          justify-content: flex-end;
+          background: none;
+        }
+        .vertical-slider-wrapper,
+        sonos-simple-vertical-slider {
           width: 100%;
-          background: #18191c;
-          border-radius: 12px;
-          padding: 1rem;
+          min-width: 0;
+          max-width: 80px;
+          box-sizing: border-box;
         }
         .grouping-header-buttons {
           display: flex;
@@ -113,39 +136,6 @@ export class Grouping extends LitElement {
         .group-all-btn:hover,
         .ungroup-all-btn:hover {
           background: #35363c;
-        }
-        .grouping-speaker-columns {
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: flex-end;
-          gap: 1.5rem;
-          width: 100%;
-          height: 100%;
-        }
-        .speaker-column {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: flex-end;
-          flex: 1 1 0;
-          min-width: 0;
-          max-width: 100%;
-          background: none;
-        }
-        .vertical-slider-wrapper {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: flex-end;
-          height: 160px;
-          width: 48px;
-          margin-bottom: 1rem;
-        }
-        .vertical-volume,
-        sonos-simple-vertical-slider {
-          width: 48px;
-          height: 160px;
         }
         .speaker-controls {
           display: flex;
