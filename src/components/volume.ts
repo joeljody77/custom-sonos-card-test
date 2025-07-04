@@ -4,6 +4,8 @@ import MediaControlService from '../services/media-control-service';
 import Store from '../model/store';
 import { CardConfig } from '../types';
 import { MediaPlayer } from '../model/media-player';
+import noUiSlider from 'nouislider';
+import 'nouislider/dist/nouislider.css';
 
 class Volume extends LitElement {
   @property({ attribute: false }) store!: Store;
@@ -24,15 +26,14 @@ class Volume extends LitElement {
     const max = this.getMax(volume);
     const disabled = this.player.ignoreVolume;
 
-    // Force vertical slider for all usages
+    // Use nouislider-based vertical slider for all usages
     return html`
-      <sonos-vertical-slider
+      <sonos-noui-vertical-slider
         .value=${volume}
         .max=${max}
         .disabled=${disabled}
-        .tickCount=${10}
         @value-changed=${this.volumeChanged}
-      ></sonos-vertical-slider>
+      ></sonos-noui-vertical-slider>
     `;
   }
 
@@ -113,115 +114,155 @@ class Volume extends LitElement {
   }
 }
 
-class SonosVerticalSlider extends LitElement {
+class SonosNoUiVerticalSlider extends LitElement {
   @property({ type: Number }) value = 0;
   @property({ type: Number }) max = 100;
   @property({ type: Boolean }) disabled = false;
-  @property({ type: Number }) tickCount = 10;
 
-  private onInput(e: Event) {
-    const newValue = Number((e.target as HTMLInputElement).value);
-    this.value = newValue;
-    this.dispatchEvent(new CustomEvent('value-changed', { detail: { value: newValue } }));
+  private sliderEl?: HTMLDivElement;
+  private slider?: noUiSlider.API;
+
+  firstUpdated() {
+    console.log('SonosNoUiVerticalSlider firstUpdated');
+    this.sliderEl = this.renderRoot.querySelector('.noui-vertical-slider') as HTMLDivElement;
+    if (this.sliderEl) {
+      console.log('Slider container found:', this.sliderEl);
+      this.slider = noUiSlider.create(this.sliderEl, {
+        start: [this.value],
+        orientation: 'vertical',
+        direction: 'rtl',
+        range: {
+          min: 0,
+          max: this.max,
+        },
+        step: 1,
+        connect: [true, false],
+        tooltips: false,
+      });
+      this.slider.on('update', (values) => {
+        const newValue = Math.round(Number(values[0]));
+        if (newValue !== this.value) {
+          this.value = newValue;
+          this.dispatchEvent(new CustomEvent('value-changed', { detail: { value: newValue } }));
+        }
+      });
+      if (this.disabled) {
+        this.sliderEl.setAttribute('disabled', 'true');
+      } else {
+        this.sliderEl.removeAttribute('disabled');
+      }
+    } else {
+      console.warn('Slider container NOT found');
+    }
+  }
+
+  updated(changedProps: Map<string, unknown>) {
+    if (this.slider) {
+      if (changedProps.has('value')) {
+        this.slider.set([this.value]);
+      }
+      if (changedProps.has('max')) {
+        this.slider.updateOptions({ range: { min: 0, max: this.max } });
+      }
+      if (changedProps.has('disabled')) {
+        if (this.disabled) {
+          this.sliderEl?.setAttribute('disabled', 'true');
+        } else {
+          this.sliderEl?.removeAttribute('disabled');
+        }
+      }
+    }
   }
 
   render() {
-    const ticks = Array.from({ length: this.tickCount + 1 }, (_, i) => i);
+    console.log('SonosNoUiVerticalSlider render', { value: this.value, max: this.max, disabled: this.disabled });
     return html`
-      <div class="vertical-slider-container">
-        <div class="slider-track">
-          <input
-            type="range"
-            min="0"
-            max="${this.max}"
-            .value="${String(this.value)}"
-            ?disabled="${this.disabled}"
-            class="vertical-slider"
-            @input="${this.onInput}"
-            orient="vertical"
-          />
-          <div class="slider-ticks">
-            ${ticks.map(
-              (i) =>
-                html`<div
-                  class="slider-tick"
-                  style="bottom: ${(i / this.tickCount) *
-                  100}%; background: linear-gradient(90deg, #4f5bd5, #b48aff); opacity: ${i / this.tickCount};"
-                ></div>`,
-            )}
-          </div>
-        </div>
-        <div class="slider-value">${this.value}%</div>
-      </div>
+      <div class="noui-vertical-slider" style="height: 120px; width: 32px;"></div>
+      <div class="slider-value">${this.value}%</div>
     `;
   }
 
   static get styles() {
-    return css`
-      .vertical-slider-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        height: 140px;
-        width: 32px;
-        position: relative;
-      }
-      .slider-track {
-        position: relative;
-        height: 120px;
-        width: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .vertical-slider {
-        /* Modern cross-browser vertical slider */
-        writing-mode: vertical-lr;
-        direction: rtl;
-        width: 32px;
-        height: 120px;
-        min-width: 32px;
-        min-height: 120px;
-        max-width: 32px;
-        max-height: 120px;
-        display: block;
-        margin: 0 auto;
-        background: linear-gradient(180deg, #4f5bd5 0%, #b48aff 100%);
-        border-radius: 8px;
-        outline: none;
-        accent-color: #b48aff;
-        z-index: 2;
-      }
-      .vertical-slider:disabled {
-        opacity: 0.5;
-      }
-      .slider-ticks {
-        position: absolute;
-        left: 50%;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        transform: translateX(-50%);
-        z-index: 1;
-        pointer-events: none;
-      }
-      .slider-tick {
-        position: absolute;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        border-radius: 1px;
-        background: #b48aff;
-        opacity: 0.5;
-      }
-      .slider-value {
-        margin-top: 0.3rem;
-        color: #b48aff;
-        font-size: 0.9rem;
-        font-weight: bold;
-        text-shadow: 0 1px 4px #000a;
-      }
-    `;
+    return [
+      css`
+        /* Essential nouislider CSS for vertical slider */
+        .noui-vertical-slider {
+          margin: 0 auto;
+          border: 2px solid red;
+          background: rgba(255, 0, 0, 0.1);
+        }
+        .slider-value {
+          margin-top: 0.3rem;
+          color: #b48aff;
+          font-size: 0.9rem;
+          font-weight: bold;
+          text-shadow: 0 1px 4px #000a;
+          text-align: center;
+        }
+        .noUi-target {
+          background: #222;
+          border-radius: 4px;
+          box-shadow: none;
+          position: relative;
+        }
+        .noUi-base {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          left: 0;
+          top: 0;
+        }
+        .noUi-connects {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          z-index: 1;
+        }
+        .noUi-connect {
+          background: linear-gradient(180deg, #4f5bd5 0%, #b48aff 100%);
+          border-radius: 4px;
+        }
+        .noUi-vertical {
+          width: 32px;
+          height: 120px;
+        }
+        .noUi-handle {
+          position: absolute;
+          z-index: 2;
+          box-sizing: border-box;
+          cursor: pointer;
+          border-radius: 50%;
+          background: #b48aff;
+          border: 2px solid #fff;
+          width: 28px;
+          height: 28px;
+          left: 2px;
+          top: auto;
+          bottom: 0;
+          transform: translateY(50%);
+        }
+        .noUi-handle:after,
+        .noUi-handle:before {
+          display: none;
+        }
+        .noUi-tooltip {
+          display: none;
+        }
+        .noUi-vertical .noUi-handle {
+          left: 2px;
+        }
+        .noUi-vertical .noUi-origin {
+          width: 100%;
+        }
+        .noUi-origin {
+          position: absolute;
+          right: 0;
+          top: 0;
+          left: 0;
+          bottom: 0;
+        }
+      `,
+    ];
   }
 }
 
@@ -230,4 +271,4 @@ function numberFromEvent(e: Event) {
 }
 
 customElements.define('sonos-volume', Volume);
-customElements.define('sonos-vertical-slider', SonosVerticalSlider);
+customElements.define('sonos-noui-vertical-slider', SonosNoUiVerticalSlider);

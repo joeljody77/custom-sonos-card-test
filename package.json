@@ -10,7 +10,8 @@
   "dependencies": {
     "@mdi/js": "^7.4.47",
     "custom-card-helpers": "^1.9.0",
-    "lit": "^3.3.0"
+    "lit": "^3.3.0",
+    "nouislider": "^15.8.1"
   },
   "devDependencies": {
     "@babel/core": "^7.27.7",
