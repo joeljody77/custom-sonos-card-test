@@ -60,7 +60,12 @@ export class Grouping extends LitElement {
                   <button class="mute-btn" @click=${() => this.mutePlayer(item)} aria-label="Mute">
                     <ha-icon .icon="mdi:volume-off"></ha-icon>
                   </button>
-                  <button class="group-btn" @click=${() => this.toggleItem(item)} ?selected=${item.isSelected} aria-label="Group">
+                  <button
+                    class="group-btn"
+                    @click=${() => this.toggleItem(item)}
+                    ?selected=${item.isSelected}
+                    aria-label="Group"
+                  >
                     <ha-icon .icon="mdi:account-group"></ha-icon>
                   </button>
                 </div>
