@@ -1,9 +1,8 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { property } from 'lit/decorators.js';
 import MediaControlService from '../services/media-control-service';
 import Store from '../model/store';
 import { CardConfig } from '../types';
-import { mdiVolumeHigh, mdiVolumeMute } from '@mdi/js';
 import { MediaPlayer } from '../model/media-player';
 
 class Volume extends LitElement {
@@ -23,44 +22,17 @@ class Volume extends LitElement {
 
     const volume = this.player.getVolume();
     const max = this.getMax(volume);
-
-    const isMuted = this.updateMembers ? this.player.isGroupMuted() : this.player.isMemberMuted();
-    const muteIcon = isMuted ? mdiVolumeMute : mdiVolumeHigh;
     const disabled = this.player.ignoreVolume;
 
-    // Use vertical slider if orientation is vertical
-    if (this.orientation === 'vertical') {
-      return html`
-        <sonos-vertical-slider
-          .value=${volume}
-          .max=${max}
-          .disabled=${disabled}
-          .tickCount=${10}
-          @value-changed=${this.volumeChanged}
-        ></sonos-vertical-slider>
-      `;
-    }
-
+    // Force vertical slider for all usages
     return html`
-      <div class="volume" slim=${this.slim || nothing}>
-        <ha-icon-button .disabled=${disabled} @click=${this.mute} .path=${muteIcon}> </ha-icon-button>
-        <div class="volume-slider">
-          <ha-control-slider
-            .value=${volume}
-            max=${max}
-            @value-changed=${this.volumeChanged}
-            .disabled=${disabled}
-            class=${this.config.dynamicVolumeSlider && max === 100 ? 'over-threshold' : ''}
-          ></ha-control-slider>
-          <div class="volume-level">
-            <div style="flex: ${volume}">0%</div>
-            <div class="percentage">${volume}%</div>
-            <div style="flex: ${max - volume};text-align: right">${max}%</div>
-          </div>
-        </div>
-        <div class="percentage-slim" hide=${this.slim && nothing}>${volume}%</div>
-        <sonos-ha-player .store=${this.store} .features=${this.store.showPower()}></sonos-ha-player>
-      </div>
+      <sonos-vertical-slider
+        .value=${volume}
+        .max=${max}
+        .disabled=${disabled}
+        .tickCount=${10}
+        @value-changed=${this.volumeChanged}
+      ></sonos-vertical-slider>
     `;
   }
 
