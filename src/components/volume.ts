@@ -390,11 +390,13 @@ class SonosSimpleVerticalSlider extends LitElement {
         flex-direction: column;
         align-items: center;
         justify-content: stretch;
+        max-height: 400px;
       }
       .slider-track {
         position: relative;
         width: 12px;
-        height: 100%; /* Fill the available height */
+        height: 100%;
+        max-height: 400px;
         background: #18191c;
         border-radius: 8px;
         box-shadow: 0 0 8px #000a;

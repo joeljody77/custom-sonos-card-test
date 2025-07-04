@@ -88,15 +88,19 @@ export class Grouping extends LitElement {
           max-height: 100%;
           overflow: hidden;
           box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
         }
         .grouping-speaker-columns {
+          flex: 1 1 0;
           display: flex;
           flex-direction: row;
           justify-content: stretch;
-          align-items: flex-end;
+          align-items: stretch;
           gap: 1.5rem;
           width: 100%;
           height: 100%;
+          min-height: 0;
         }
         .speaker-column {
           flex: 1 1 0;
@@ -106,8 +110,9 @@ export class Grouping extends LitElement {
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: stretch;
+          justify-content: space-between;
           background: none;
+          min-height: 0;
         }
         .vertical-slider-wrapper,
         sonos-simple-vertical-slider {
@@ -119,6 +124,11 @@ export class Grouping extends LitElement {
           display: flex;
           flex-direction: column;
           justify-content: flex-end;
+          align-items: center;
+        }
+        sonos-simple-vertical-slider {
+          max-height: 400px;
+          height: 100%;
         }
         .grouping-header-buttons {
           display: flex;
@@ -146,6 +156,7 @@ export class Grouping extends LitElement {
           display: flex;
           gap: 0.5rem;
           margin-bottom: 0.5rem;
+          justify-content: center;
         }
         .mute-btn,
         .group-btn {
