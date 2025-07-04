@@ -53,6 +53,7 @@ export class Grouping extends LitElement {
                     .max=${100}
                     .disabled=${item.isDisabled}
                     .tickCount=${12}
+                    .grouped=${item.isSelected}
                     @value-changed=${(e: CustomEvent) =>
                       this.mediaControlService.volumeSet(item.player, e.detail.value, false)}
                   ></sonos-simple-vertical-slider>

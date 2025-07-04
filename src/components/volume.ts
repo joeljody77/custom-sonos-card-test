@@ -280,6 +280,7 @@ class SonosSimpleVerticalSlider extends LitElement {
   @property({ type: Number }) max = 100;
   @property({ type: Boolean }) disabled = false;
   @property({ type: Number }) tickCount = 10;
+  @property({ type: Boolean }) grouped = true;
 
   private dragging = false;
 
@@ -353,19 +354,26 @@ class SonosSimpleVerticalSlider extends LitElement {
 
   render() {
     const ticks = Array.from({ length: this.tickCount + 1 }, (_, i) => i);
-    const thumbY = this.percent * 100;
+    // Prevent thumb from extending past the top (0%) or bottom (100%) of the track
+    const thumbHeightPercent = (72 / (this.renderRoot.querySelector('.slider-track')?.clientHeight || 1)) * 100;
+    const thumbOffset = thumbHeightPercent / 2;
+    const thumbY = Math.max(thumbOffset, Math.min(100 - thumbOffset, this.percent * 100));
     return html`
       <div class="slider-outer">
         <div class="slider-track">
           ${ticks.map((i) => {
             const tickPercent = i / this.tickCount;
             const tickY = tickPercent * 100;
-            // Color interpolation: 0% dark blue, 50% light blue, 100% dark purple
-            let color = '#232a5c';
-            if (tickPercent < 0.5) {
-              color = this.lerpColor('#232a5c', '#4f8fff', tickPercent / 0.5);
+            let color;
+            if (this.grouped) {
+              // Color interpolation: 0% dark blue, 50% light blue, 100% dark purple
+              if (tickPercent < 0.5) {
+                color = this.lerpColor('#232a5c', '#4f8fff', tickPercent / 0.5);
+              } else {
+                color = this.lerpColor('#4f8fff', '#7d2fa6', (tickPercent - 0.5) / 0.5);
+              }
             } else {
-              color = this.lerpColor('#4f8fff', '#7d2fa6', (tickPercent - 0.5) / 0.5);
+              color = '#444';
             }
             const active = tickPercent <= this.percent;
             return html`<div
