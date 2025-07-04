@@ -28,9 +28,17 @@ export class Grouping extends LitElement {
     this.activePlayer = this.store.activePlayer;
     this.mediaControlService = this.store.mediaControlService;
     this.mediaPlayerIds = this.store.allMediaPlayers.map((player) => player.id);
-    this.groupingItems = this.store.allMediaPlayers.map(
-      (player) => new GroupingItem(player, this.activePlayer, this.modifiedItems.includes(player.id))
-    );
+    const customOrder = [
+      'media_player.living',
+      'media_player.lounge',
+      'media_player.hallway',
+      'media_player.master_bedroom',
+      'media_player.office',
+    ];
+    this.groupingItems = customOrder
+      .map((id) => this.store.allMediaPlayers.find((player) => player.id === id))
+      .filter(Boolean)
+      .map((player) => new GroupingItem(player!, this.activePlayer, this.modifiedItems.includes(player!.id)));
     this.notJoinedPlayers = this.getNotJoinedPlayers();
     this.joinedPlayers = this.getJoinedPlayers();
 
