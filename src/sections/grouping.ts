@@ -46,15 +46,15 @@ export class Grouping extends LitElement {
             (item) => html`
               <div class="speaker-column" ?disabled=${item.isDisabled}>
                 <div class="vertical-slider-wrapper">
-                  <sonos-volume
+                  <sonos-simple-vertical-slider
                     class="vertical-volume"
-                    .store=${this.store}
-                    .player=${item.player}
-                    .updateMembers=${false}
-                    .slim=${true}
-                    orientation="vertical"
-                  ></sonos-volume>
-                  <!-- Placeholder for colored tick marks and dynamic color effects -->
+                    .value=${item.player.getVolume()}
+                    .max=${100}
+                    .disabled=${item.isDisabled}
+                    .tickCount=${12}
+                    @value-changed=${(e: CustomEvent) =>
+                      this.mediaControlService.volumeSet(item.player, e.detail.value, false)}
+                  ></sonos-simple-vertical-slider>
                 </div>
                 <div class="speaker-controls">
                   <button class="mute-btn" @click=${() => this.mutePlayer(item)}>
@@ -121,8 +121,8 @@ export class Grouping extends LitElement {
           flex-direction: column;
           align-items: center;
           justify-content: flex-end;
-          background: none;
           min-width: 70px;
+          background: none;
         }
         .vertical-slider-wrapper {
           display: flex;
@@ -130,18 +130,13 @@ export class Grouping extends LitElement {
           align-items: center;
           justify-content: flex-end;
           height: 160px;
-          width: 40px;
-          min-width: 40px;
-          min-height: 140px;
-          max-width: 40px;
-          max-height: 160px;
+          width: 48px;
+          margin-bottom: 1rem;
         }
-        .vertical-volume {
-          /* Placeholder for vertical slider styling */
-          writing-mode: bt-lr;
-          transform: rotate(-90deg);
-          height: 140px;
-          width: 32px;
+        .vertical-volume,
+        sonos-simple-vertical-slider {
+          width: 48px;
+          height: 160px;
         }
         .speaker-controls {
           display: flex;
