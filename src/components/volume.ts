@@ -14,8 +14,10 @@ class Volume extends LitElement {
   @property({ type: Boolean }) updateMembers = true;
   @property() volumeClicked?: () => void;
   @property() slim: boolean = false;
+  @property({ type: String }) orientation?: string;
 
   render() {
+    console.log('sonos-volume orientation:', this.orientation);
     this.config = this.store.config;
     this.mediaControlService = this.store.mediaControlService;
 
@@ -27,7 +29,7 @@ class Volume extends LitElement {
     const disabled = this.player.ignoreVolume;
 
     // Use vertical slider if orientation is vertical
-    if ((this as any).orientation === 'vertical') {
+    if (this.orientation === 'vertical') {
       return html`
         <sonos-vertical-slider
           .value=${volume}
@@ -168,10 +170,12 @@ class SonosVerticalSlider extends LitElement {
           />
           <div class="slider-ticks">
             ${ticks.map(
-              (i) => html`<div
-                class="slider-tick"
-                style="bottom: ${(i / this.tickCount) * 100}%; background: linear-gradient(90deg, #4f5bd5, #b48aff); opacity: ${i / this.tickCount};"
-              ></div>`
+              (i) =>
+                html`<div
+                  class="slider-tick"
+                  style="bottom: ${(i / this.tickCount) *
+                  100}%; background: linear-gradient(90deg, #4f5bd5, #b48aff); opacity: ${i / this.tickCount};"
+                ></div>`,
             )}
           </div>
         </div>

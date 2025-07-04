@@ -1,4 +1,4 @@
-import { css, html, LitElement, nothing } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import MediaControlService from '../services/media-control-service';
@@ -42,30 +42,32 @@ export class Grouping extends LitElement {
           <button class="ungroup-all-btn" @click=${this.deSelectAll}>UNGROUP ALL</button>
         </div>
         <div class="grouping-speaker-columns">
-          ${this.groupingItems.map((item) => html`
-            <div class="speaker-column" ?disabled=${item.isDisabled}>
-              <div class="vertical-slider-wrapper">
-                <sonos-volume
-                  class="vertical-volume"
-                  .store=${this.store}
-                  .player=${item.player}
-                  .updateMembers=${false}
-                  .slim=${true}
-                  orientation="vertical"
-                ></sonos-volume>
-                <!-- Placeholder for colored tick marks and dynamic color effects -->
+          ${this.groupingItems.map(
+            (item) => html`
+              <div class="speaker-column" ?disabled=${item.isDisabled}>
+                <div class="vertical-slider-wrapper">
+                  <sonos-volume
+                    class="vertical-volume"
+                    .store=${this.store}
+                    .player=${item.player}
+                    .updateMembers=${false}
+                    .slim=${true}
+                    orientation="vertical"
+                  ></sonos-volume>
+                  <!-- Placeholder for colored tick marks and dynamic color effects -->
+                </div>
+                <div class="speaker-controls">
+                  <button class="mute-btn" @click=${() => this.mutePlayer(item)}>
+                    <ha-icon .icon="mdi:volume-mute"></ha-icon>
+                  </button>
+                  <button class="group-btn" @click=${() => this.toggleItem(item)} ?selected=${item.isSelected}>
+                    <ha-icon .icon="mdi:account-multiple"></ha-icon>
+                  </button>
+                </div>
+                <div class="speaker-name">${item.name}</div>
               </div>
-              <div class="speaker-controls">
-                <button class="mute-btn" @click=${() => this.mutePlayer(item)}>
-                  <ha-icon .icon="mdi:volume-mute"></ha-icon>
-                </button>
-                <button class="group-btn" @click=${() => this.toggleItem(item)} ?selected=${item.isSelected}>
-                  <ha-icon .icon="mdi:account-multiple"></ha-icon>
-                </button>
-              </div>
-              <div class="speaker-name">${item.name}</div>
-            </div>
-          `)}
+            `,
+          )}
         </div>
       </div>
     `;
@@ -89,7 +91,8 @@ export class Grouping extends LitElement {
           gap: 1rem;
           margin-bottom: 1.5rem;
         }
-        .group-all-btn, .ungroup-all-btn {
+        .group-all-btn,
+        .ungroup-all-btn {
           background: #23242a;
           color: #fff;
           border: none;
@@ -101,7 +104,8 @@ export class Grouping extends LitElement {
           cursor: pointer;
           transition: background 0.2s;
         }
-        .group-all-btn:hover, .ungroup-all-btn:hover {
+        .group-all-btn:hover,
+        .ungroup-all-btn:hover {
           background: #35363c;
         }
         .grouping-speaker-columns {
@@ -138,7 +142,8 @@ export class Grouping extends LitElement {
           gap: 0.5rem;
           margin-bottom: 0.5rem;
         }
-        .mute-btn, .group-btn {
+        .mute-btn,
+        .group-btn {
           background: #23242a;
           border: none;
           border-radius: 50%;
@@ -151,9 +156,12 @@ export class Grouping extends LitElement {
           font-size: 1.3rem;
           box-shadow: 0 2px 6px #0003;
           cursor: pointer;
-          transition: background 0.2s, color 0.2s;
+          transition:
+            background 0.2s,
+            color 0.2s;
         }
-        .mute-btn:hover, .group-btn:hover {
+        .mute-btn:hover,
+        .group-btn:hover {
           background: #35363c;
         }
         .group-btn[selected] {
