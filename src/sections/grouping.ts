@@ -185,6 +185,14 @@ export class Grouping extends LitElement {
           opacity: 0.5;
           pointer-events: none;
         }
+        .grouping-vertical-wrapper,
+        .card-content {
+          width: 100% !important;
+          max-width: 100% !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          box-sizing: border-box !important;
+        }
       `,
     ];
   }
