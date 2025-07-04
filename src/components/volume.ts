@@ -400,9 +400,9 @@ class SonosSimpleVerticalSlider extends LitElement {
         width: 48px;
         height: 100%;
         max-height: none;
-        background: #18191c;
-        border-radius: 8px;
-        box-shadow: 0 0 8px #000a;
+        background: #111216;
+        border-radius: 24px;
+        box-shadow: 0 2px 12px #000a inset, 0 0 8px #000a;
         margin: 0 auto;
         cursor: pointer;
         display: flex;
@@ -411,10 +411,10 @@ class SonosSimpleVerticalSlider extends LitElement {
       }
       .slider-tick {
         position: absolute;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        border-radius: 1px;
+        left: 10%;
+        width: 80%;
+        height: 4px;
+        border-radius: 2px;
         transition:
           background 0.2s,
           opacity 0.2s;
@@ -425,11 +425,11 @@ class SonosSimpleVerticalSlider extends LitElement {
         left: 50%;
         transform: translate(-50%, 0);
         width: 48px;
-        height: 32px;
-        background: linear-gradient(180deg, #e0e0e0 0%, #888 100%);
-        border-radius: 4px;
+        height: 36px;
+        background: linear-gradient(180deg, #e0e0e0 0%, #bdbdbd 40%, #888 60%, #444 100%);
+        border-radius: 8px;
         box-shadow:
-          0 2px 8px #000a,
+          0 4px 16px #000c,
           0 0 0 2px #23242a;
         border: 2px solid #444;
         z-index: 2;
@@ -438,6 +438,18 @@ class SonosSimpleVerticalSlider extends LitElement {
         align-items: center;
         justify-content: center;
         transition: box-shadow 0.2s;
+      }
+      .slider-thumb::before {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        top: 16px;
+        height: 2px;
+        background: linear-gradient(90deg, #fff 0%, #bbb 100%);
+        opacity: 0.7;
+        border-radius: 1px;
       }
       .slider-thumb:active {
         box-shadow:
