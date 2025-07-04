@@ -356,7 +356,7 @@ class SonosSimpleVerticalSlider extends LitElement {
     const thumbY = this.percent * 100;
     return html`
       <div class="slider-outer">
-        <div class="slider-track" @click=${this.onTrackClick}>
+        <div class="slider-track">
           ${ticks.map((i) => {
             const tickPercent = i / this.tickCount;
             const tickY = tickPercent * 100;
