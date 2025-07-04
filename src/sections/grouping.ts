@@ -120,6 +120,7 @@ export class Grouping extends LitElement {
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: flex-end;
           background: none;
           min-width: 70px;
         }
@@ -127,8 +128,13 @@ export class Grouping extends LitElement {
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: flex-end;
           height: 160px;
-          margin-bottom: 1rem;
+          width: 40px;
+          min-width: 40px;
+          min-height: 140px;
+          max-width: 40px;
+          max-height: 160px;
         }
         .vertical-volume {
           /* Placeholder for vertical slider styling */
