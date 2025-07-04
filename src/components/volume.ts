@@ -454,7 +454,7 @@ class SonosSimpleVerticalSlider extends LitElement {
             ></div>`;
           })}
           <div
-            class="slider-thumb"
+            class="slider-thumb${!this.grouped ? ' not-grouped' : ''}"
             style="bottom: ${thumbY}%;"
             @mousedown=${(e: MouseEvent) => {
               e.stopPropagation();
@@ -554,6 +554,11 @@ class SonosSimpleVerticalSlider extends LitElement {
           transform 0.15s;
         backdrop-filter: blur(1.5px) saturate(1.2);
         -webkit-backdrop-filter: blur(1.5px) saturate(1.2);
+      }
+      .slider-thumb.not-grouped {
+        background: linear-gradient(180deg, #bbb 0%, #888 100%);
+        box-shadow: 0 2px 8px #222a, 0 0 0 2px #444a;
+        border: 2px solid #888;
       }
       .slider-thumb::before {
         content: '';
