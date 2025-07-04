@@ -119,16 +119,20 @@ export class Grouping extends LitElement {
           flex: 1 1 0;
           min-height: 0;
           width: 100%;
-          max-width: 80px;
+          max-width: 160px;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          justify-content: flex-end;
+          justify-content: flex-start;
           align-items: center;
+          margin-top: 0;
+          padding-top: 0;
         }
         sonos-simple-vertical-slider {
-          max-height: 400px;
+          max-height: none;
           height: 100%;
+          width: 100%;
+          min-width: 0;
         }
         .grouping-header-buttons {
           display: flex;
