@@ -203,8 +203,9 @@ class SonosVerticalSlider extends LitElement {
         justify-content: center;
       }
       .vertical-slider {
-        writing-mode: bt-lr;
-        -webkit-appearance: slider-vertical;
+        /* Modern cross-browser vertical slider */
+        writing-mode: vertical-lr;
+        direction: rtl;
         width: 32px;
         height: 120px;
         background: linear-gradient(180deg, #4f5bd5 0%, #b48aff 100%);
