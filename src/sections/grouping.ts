@@ -9,7 +9,7 @@ import { MediaPlayer } from '../model/media-player';
 import '../components/grouping-button';
 import { CardConfig, PredefinedGroup, PredefinedGroupPlayer } from '../types';
 import { GroupingItem } from '../model/grouping-item';
-import { mdiVolumeOff, mdiAccountGroup } from '@mdi/js';
+import { mdiVolumeOff, mdiVolumeHigh, mdiAccountGroup } from '@mdi/js';
 
 export class Grouping extends LitElement {
   @property({ attribute: false }) store!: Store;
@@ -28,7 +28,9 @@ export class Grouping extends LitElement {
     this.activePlayer = this.store.activePlayer;
     this.mediaControlService = this.store.mediaControlService;
     this.mediaPlayerIds = this.store.allMediaPlayers.map((player) => player.id);
-    this.groupingItems = this.getGroupingItems();
+    this.groupingItems = this.store.allMediaPlayers.map(
+      (player) => new GroupingItem(player, this.activePlayer, this.modifiedItems.includes(player.id))
+    );
     this.notJoinedPlayers = this.getNotJoinedPlayers();
     this.joinedPlayers = this.getJoinedPlayers();
 
@@ -67,7 +69,7 @@ export class Grouping extends LitElement {
                     aria-label="Mute"
                   >
                     <svg viewBox="0 0 24 24" width="24" height="24">
-                      <path d="${mdiVolumeOff}" fill="currentColor" />
+                      <path d="${item.player.isMemberMuted() ? mdiVolumeOff : mdiVolumeHigh}" fill="currentColor" />
                     </svg>
                   </button>
                   <button
