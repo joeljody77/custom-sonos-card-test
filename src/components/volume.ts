@@ -281,11 +281,42 @@ class SonosSimpleVerticalSlider extends LitElement {
   @property({ type: Boolean }) disabled = false;
   @property({ type: Number }) tickCount = 10;
   @property({ type: Boolean }) grouped = true;
+  private trackHeight: number = 0;
+  private resizeObserver?: ResizeObserver;
 
   private dragging = false;
 
   private get percent() {
     return Math.max(0, Math.min(1, this.value / this.max));
+  }
+
+  firstUpdated() {
+    this.measureTrackHeight();
+    this.resizeObserver = new ResizeObserver(() => {
+      this.measureTrackHeight();
+    });
+    const track = this.renderRoot.querySelector('.slider-track');
+    if (track) {
+      this.resizeObserver.observe(track);
+    }
+  }
+
+  disconnectedCallback() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    super.disconnectedCallback();
+  }
+
+  private measureTrackHeight() {
+    const track = this.renderRoot.querySelector('.slider-track') as HTMLElement;
+    if (track) {
+      const newHeight = track.clientHeight;
+      if (newHeight !== this.trackHeight) {
+        this.trackHeight = newHeight;
+        this.requestUpdate();
+      }
+    }
   }
 
   private onTrackClick(e: MouseEvent) {
@@ -355,9 +386,10 @@ class SonosSimpleVerticalSlider extends LitElement {
   render() {
     const ticks = Array.from({ length: this.tickCount + 1 }, (_, i) => i);
     // Prevent thumb from extending past the top (0%) or bottom (100%) of the track
-    const thumbHeightPercent = (72 / (this.renderRoot.querySelector('.slider-track')?.clientHeight || 1)) * 100;
-    const thumbOffset = thumbHeightPercent / 2;
-    const thumbY = Math.max(thumbOffset, Math.min(100 - thumbOffset, this.percent * 100));
+    const thumbHeight = 72; // px, must match CSS
+    const trackHeight = this.trackHeight || 1;
+    const thumbOffsetPercent = (thumbHeight / trackHeight) * 50; // half thumb height as percent of track
+    const thumbY = Math.max(thumbOffsetPercent, Math.min(100 - thumbOffsetPercent, this.percent * 100));
     return html`
       <div class="slider-outer">
         <div class="slider-track">
