@@ -409,7 +409,7 @@ class SonosSimpleVerticalSlider extends LitElement {
             }
             const active = tickPercent <= this.percent;
             return html`<div
-              class="slider-tick"
+              class="slider-tick${this.grouped && active ? ' active' : ''}"
               style="bottom: ${tickY}%; background: ${active ? color : '#23242a'}; opacity: ${active ? 1 : 0.4};"
             ></div>`;
           })}
@@ -452,16 +452,19 @@ class SonosSimpleVerticalSlider extends LitElement {
         width: 48px;
         height: 100%;
         max-height: none;
-        background: #111216;
+        background: linear-gradient(180deg, #18191c 0%, #23242a 100%);
         border-radius: 24px;
         box-shadow:
           0 2px 12px #000a inset,
-          0 0 8px #000a;
+          0 0 8px #000a,
+          0 8px 32px 0 #232a5c22;
         margin: 0 auto;
         cursor: pointer;
         display: flex;
         flex-direction: column;
         align-items: center;
+        backdrop-filter: blur(2px) saturate(1.2);
+        -webkit-backdrop-filter: blur(2px) saturate(1.2);
       }
       .slider-tick {
         position: absolute;
@@ -470,10 +473,15 @@ class SonosSimpleVerticalSlider extends LitElement {
         height: 4px;
         border-radius: 2px;
         transition:
-          background 0.2s,
-          opacity 0.2s;
+          background 0.3s,
+          opacity 0.3s,
+          box-shadow 0.3s;
         z-index: 1;
         pointer-events: none;
+      }
+      .slider-tick[active],
+      .slider-tick.active {
+        box-shadow: 0 0 8px #4f8fff88;
       }
       .slider-thumb {
         position: absolute;
@@ -481,9 +489,13 @@ class SonosSimpleVerticalSlider extends LitElement {
         transform: translate(-50%, 0);
         width: 96px;
         height: 72px;
-        background: linear-gradient(180deg, #e0e0e0 0%, #bdbdbd 40%, #888 60%, #444 100%);
+        background:
+          linear-gradient(180deg, #e0e0e0 0%, #bdbdbd 40%, #888 60%, #444 100%),
+          repeating-linear-gradient(135deg, #fff1 0 2px, transparent 2px 8px);
         border-radius: 8px;
         box-shadow:
+          0 4px 24px #4f8fff55,
+          0 0 0 2px #b48aff,
           0 4px 16px #000c,
           0 0 0 2px #23242a;
         border: 2px solid #444;
@@ -492,7 +504,12 @@ class SonosSimpleVerticalSlider extends LitElement {
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: box-shadow 0.2s;
+        transition:
+          box-shadow 0.2s,
+          bottom 0.25s cubic-bezier(0.4, 2, 0.6, 1),
+          transform 0.15s;
+        backdrop-filter: blur(1.5px) saturate(1.2);
+        -webkit-backdrop-filter: blur(1.5px) saturate(1.2);
       }
       .slider-thumb::before {
         content: '';
@@ -506,16 +523,27 @@ class SonosSimpleVerticalSlider extends LitElement {
         opacity: 0.7;
         border-radius: 1px;
       }
-      .slider-thumb:active {
+      .slider-thumb:active,
+      .slider-thumb:hover {
         box-shadow:
+          0 4px 32px #4f8fff88,
+          0 0 0 2px #b48aff,
           0 4px 16px #000c,
-          0 0 0 2px #b48aff;
+          0 0 0 2px #23242a;
         background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+        transform: translate(-50%, 0) scale(1.07);
       }
       .slider-track:active .slider-thumb {
         box-shadow:
+          0 4px 32px #4f8fff88,
+          0 0 0 2px #b48aff,
           0 4px 16px #000c,
-          0 0 0 2px #b48aff;
+          0 0 0 2px #23242a;
+      }
+      .mute-btn:active,
+      .group-btn:active {
+        transform: scale(0.95);
+        transition: transform 0.1s;
       }
     `;
   }
