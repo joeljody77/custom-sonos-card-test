@@ -57,11 +57,11 @@ export class Grouping extends LitElement {
                   ></sonos-simple-vertical-slider>
                 </div>
                 <div class="speaker-controls">
-                  <button class="mute-btn" @click=${() => this.mutePlayer(item)}>
-                    <ha-icon .icon="mdi:volume-mute"></ha-icon>
+                  <button class="mute-btn" @click=${() => this.mutePlayer(item)} aria-label="Mute">
+                    <ha-icon .icon="mdi:volume-off"></ha-icon>
                   </button>
-                  <button class="group-btn" @click=${() => this.toggleItem(item)} ?selected=${item.isSelected}>
-                    <ha-icon .icon="mdi:account-multiple"></ha-icon>
+                  <button class="group-btn" @click=${() => this.toggleItem(item)} ?selected=${item.isSelected} aria-label="Group">
+                    <ha-icon .icon="mdi:account-group"></ha-icon>
                   </button>
                 </div>
                 <div class="speaker-name">${item.name}</div>

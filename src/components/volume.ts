@@ -424,8 +424,8 @@ class SonosSimpleVerticalSlider extends LitElement {
         position: absolute;
         left: 50%;
         transform: translate(-50%, 0);
-        width: 32px;
-        height: 18px;
+        width: 48px;
+        height: 32px;
         background: linear-gradient(180deg, #e0e0e0 0%, #888 100%);
         border-radius: 4px;
         box-shadow:
