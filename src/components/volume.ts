@@ -326,6 +326,22 @@ class SonosSimpleVerticalSlider extends LitElement {
     this.dispatchEvent(new CustomEvent('value-changed', { detail: { value: this.value } }));
   }
 
+  // Helper to interpolate between two colors
+  private lerpColor(a: string, b: string, t: number): string {
+    const ah = a.replace('#', '');
+    const bh = b.replace('#', '');
+    const ar = parseInt(ah.substring(0, 2), 16),
+      ag = parseInt(ah.substring(2, 4), 16),
+      ab = parseInt(ah.substring(4, 6), 16);
+    const br = parseInt(bh.substring(0, 2), 16),
+      bg = parseInt(bh.substring(2, 4), 16),
+      bb = parseInt(bh.substring(4, 6), 16);
+    const rr = ar + t * (br - ar);
+    const rg = ag + t * (bg - ag);
+    const rb = ab + t * (bb - ab);
+    return `rgb(${rr.toFixed(0)},${rg.toFixed(0)},${rb.toFixed(0)})`;
+  }
+
   render() {
     const ticks = Array.from({ length: this.tickCount + 1 }, (_, i) => i);
     const thumbY = this.percent * 100;
@@ -335,9 +351,14 @@ class SonosSimpleVerticalSlider extends LitElement {
           ${ticks.map((i) => {
             const tickPercent = i / this.tickCount;
             const tickY = tickPercent * 100;
-            // Gradient: blue at low, purple at high
-            const color = `linear-gradient(90deg, #4f5bd5 ${(tickPercent * 100).toFixed(0)}%, #b48aff 100%)`;
-            const active = tickPercent >= this.percent;
+            // Color interpolation: 0% dark blue, 50% light blue, 100% dark purple
+            let color = '#232a5c';
+            if (tickPercent < 0.5) {
+              color = this.lerpColor('#232a5c', '#4f8fff', tickPercent / 0.5);
+            } else {
+              color = this.lerpColor('#4f8fff', '#7d2fa6', (tickPercent - 0.5) / 0.5);
+            }
+            const active = tickPercent <= this.percent;
             return html`<div
               class="slider-tick"
               style="bottom: ${tickY}%; background: ${active ? color : '#23242a'}; opacity: ${active ? 1 : 0.4};"
