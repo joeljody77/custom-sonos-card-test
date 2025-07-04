@@ -433,6 +433,7 @@ class SonosSimpleVerticalSlider extends LitElement {
           background 0.2s,
           opacity 0.2s;
         z-index: 1;
+        pointer-events: none;
       }
       .slider-thumb {
         position: absolute;
@@ -446,7 +447,7 @@ class SonosSimpleVerticalSlider extends LitElement {
           0 4px 16px #000c,
           0 0 0 2px #23242a;
         border: 2px solid #444;
-        z-index: 2;
+        z-index: 10;
         cursor: grab;
         display: flex;
         align-items: center;
