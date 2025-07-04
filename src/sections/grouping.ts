@@ -77,11 +77,17 @@ export class Grouping extends LitElement {
     return [
       listStyle,
       css`
+        :host {
+          height: 100%;
+          width: 100%;
+          display: block;
+        }
         .grouping-vertical-wrapper {
           display: flex;
           flex-direction: column;
           align-items: center;
           height: 100%;
+          width: 100%;
           background: #18191c;
           border-radius: 12px;
           padding: 1rem;
@@ -115,6 +121,7 @@ export class Grouping extends LitElement {
           align-items: flex-end;
           gap: 2.5rem;
           width: 100%;
+          height: 100%;
         }
         .speaker-column {
           display: flex;
