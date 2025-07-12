@@ -285,17 +285,63 @@ export class Card extends LitElement {
           left: 50%;
           transform: translate(-50%, -50%);
           --mdc-theme-primary: var(--accent-color);
+          filter: drop-shadow(0 4px 8px #0006);
         }
         .title {
-          margin: 0.4rem 0;
+          margin: 0.8rem 0;
           text-align: center;
-          font-weight: bold;
-          font-size: 1.2rem;
-          color: var(--secondary-text-color);
+          font-weight: 700;
+          font-size: 1.4rem;
+          color: var(--primary-text-color);
+          text-shadow: 0 2px 4px #0004;
+          letter-spacing: 0.5px;
+          background: linear-gradient(135deg, var(--primary-text-color) 0%, var(--accent-color) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
         .no-players {
           text-align: center;
           margin-top: 50%;
+          color: var(--secondary-text-color);
+          font-size: 1.1rem;
+          text-shadow: 0 1px 2px #0004;
+        }
+        ha-card {
+          border-radius: 16px;
+          box-shadow: 
+            0 8px 32px #0008,
+            0 4px 16px #0004,
+            0 0 0 1px #444;
+          backdrop-filter: blur(8px) saturate(1.2);
+          -webkit-backdrop-filter: blur(8px) saturate(1.2);
+          background: linear-gradient(135deg, 
+            rgba(26, 26, 26, 0.95) 0%, 
+            rgba(42, 42, 42, 0.95) 100%);
+          border: 1px solid #666;
+          overflow: hidden;
+          position: relative;
+        }
+        ha-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, 
+            rgba(79, 143, 255, 0.05) 0%, 
+            rgba(233, 69, 96, 0.05) 100%);
+          pointer-events: none;
+          z-index: 0;
+        }
+        .content {
+          position: relative;
+          z-index: 1;
+        }
+        .content > * {
+          position: relative;
+          z-index: 2;
         }
       `,
     ];

@@ -25,16 +25,32 @@ class Volume extends LitElement {
     const volume = this.player.getVolume();
     const max = this.getMax(volume);
     const disabled = this.player.ignoreVolume;
+    const isMuted = this.player.isMuted();
 
     // Use the custom pure CSS/HTML vertical slider for all usages
     return html`
-      <sonos-simple-vertical-slider
-        .value=${volume}
-        .max=${max}
-        .disabled=${disabled}
-        .tickCount=${12}
-        @value-changed=${this.volumeChanged}
-      ></sonos-simple-vertical-slider>
+      <div class="volume-container">
+        <sonos-simple-vertical-slider
+          .value=${volume}
+          .max=${max}
+          .disabled=${disabled}
+          .tickCount=${12}
+          @value-changed=${this.volumeChanged}
+        ></sonos-simple-vertical-slider>
+        <div class="mute-button-container">
+          <button 
+            class="mute-button${isMuted ? ' muted' : ''}"
+            @click=${this.mute}
+            ?disabled=${disabled}
+            title="${isMuted ? 'Unmute' : 'Mute'}"
+          >
+            <div class="mute-icon">
+              ${isMuted ? '🔇' : '🔊'}
+            </div>
+            <div class="mute-light${isMuted ? ' active' : ''}"></div>
+          </button>
+        </div>
+      </div>
     `;
   }
 
@@ -110,6 +126,130 @@ class Volume extends LitElement {
 
       *[hide] {
         display: none;
+      }
+
+      .volume-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 8px;
+      }
+
+      .mute-button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .mute-button {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        border: none;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 
+          0 4px 16px #0008,
+          0 0 0 1px #444;
+        overflow: hidden;
+      }
+
+      .mute-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at center, #4f8fff22 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+
+      .mute-button:hover::before {
+        opacity: 1;
+      }
+
+      .mute-button:hover {
+        transform: scale(1.1);
+        box-shadow: 
+          0 8px 24px #000c,
+          0 0 0 1px #666;
+      }
+
+      .mute-button:active {
+        transform: scale(0.95);
+        transition: transform 0.1s;
+      }
+
+      .mute-button.muted {
+        background: linear-gradient(135deg, #e94560 0%, #c41e3a 100%);
+        box-shadow: 
+          0 4px 16px #e9456044,
+          0 0 0 1px #e94560;
+      }
+
+      .mute-button.muted:hover {
+        box-shadow: 
+          0 8px 24px #e9456066,
+          0 0 0 1px #e94560;
+      }
+
+      .mute-icon {
+        font-size: 20px;
+        z-index: 2;
+        position: relative;
+        filter: drop-shadow(0 1px 2px #0004);
+      }
+
+      .mute-light {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: radial-gradient(circle, #e94560 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+
+      .mute-light.active {
+        opacity: 0.6;
+        animation: mutePulse 2s ease-in-out infinite;
+      }
+
+      @keyframes mutePulse {
+        0%, 100% {
+          opacity: 0.6;
+          transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+          opacity: 0.3;
+          transform: translate(-50%, -50%) scale(1.2);
+        }
+      }
+
+      .mute-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .mute-button:disabled:hover {
+        transform: none;
+        box-shadow: 
+          0 4px 16px #0008,
+          0 0 0 1px #444;
       }
     `;
   }
@@ -438,19 +578,24 @@ class SonosSimpleVerticalSlider extends LitElement {
             const tickY = tickPercent * 100;
             let color;
             if (this.grouped) {
-              // Color interpolation: 0% dark blue, 50% light blue, 100% dark purple
-              if (tickPercent < 0.5) {
-                color = this.lerpColor('#232a5c', '#4f8fff', tickPercent / 0.5);
+              // Enhanced color interpolation with more vibrant colors
+              if (tickPercent < 0.3) {
+                color = this.lerpColor('#1a1a2e', '#16213e', tickPercent / 0.3);
+              } else if (tickPercent < 0.6) {
+                color = this.lerpColor('#16213e', '#0f3460', (tickPercent - 0.3) / 0.3);
+              } else if (tickPercent < 0.8) {
+                color = this.lerpColor('#0f3460', '#533483', (tickPercent - 0.6) / 0.2);
               } else {
-                color = this.lerpColor('#4f8fff', '#7d2fa6', (tickPercent - 0.5) / 0.5);
+                color = this.lerpColor('#533483', '#e94560', (tickPercent - 0.8) / 0.2);
               }
             } else {
               color = '#444';
             }
             const active = tickPercent <= this.percent;
+            const pulseDelay = (i / this.tickCount) * 2; // Staggered pulse animation
             return html`<div
               class="slider-tick${this.grouped && active ? ' active' : ''}"
-              style="bottom: ${tickY}%; background: ${active ? color : '#23242a'}; opacity: ${active ? 1 : 0.4};"
+              style="bottom: ${tickY}%; background: ${active ? color : '#23242a'}; opacity: ${active ? 1 : 0.4}; animation-delay: ${pulseDelay}s;"
             ></div>`;
           })}
           <div
@@ -496,19 +641,21 @@ class SonosSimpleVerticalSlider extends LitElement {
         width: 48px;
         height: 100%;
         max-height: none;
-        background: linear-gradient(180deg, #18191c 0%, #23242a 100%);
+        background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
         border-radius: 24px;
         box-shadow:
-          0 2px 12px #000a inset,
-          0 0 8px #000a,
-          0 8px 32px 0 #232a5c22;
+          0 4px 20px #000a inset,
+          0 0 12px #000a,
+          0 12px 40px 0 #1a1a2e22,
+          0 0 0 1px #333;
         margin: 0 auto;
         cursor: pointer;
         display: flex;
         flex-direction: column;
         align-items: center;
-        backdrop-filter: blur(2px) saturate(1.2);
-        -webkit-backdrop-filter: blur(2px) saturate(1.2);
+        backdrop-filter: blur(4px) saturate(1.3);
+        -webkit-backdrop-filter: blur(4px) saturate(1.3);
+        border: 1px solid #444;
       }
       .slider-tick {
         position: absolute;
@@ -517,15 +664,38 @@ class SonosSimpleVerticalSlider extends LitElement {
         height: 4px;
         border-radius: 2px;
         transition:
-          background 0.3s,
-          opacity 0.3s,
-          box-shadow 0.3s;
+          background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+          opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+          transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1;
         pointer-events: none;
+        filter: drop-shadow(0 0 2px currentColor);
       }
       .slider-tick[active],
       .slider-tick.active {
-        box-shadow: 0 0 8px #4f8fff88;
+        box-shadow: 
+          0 0 8px currentColor,
+          0 0 16px currentColor,
+          0 0 24px currentColor;
+        animation: pulse 2s ease-in-out infinite;
+        transform: scaleY(1.2);
+      }
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+          box-shadow: 
+            0 0 8px currentColor,
+            0 0 16px currentColor,
+            0 0 24px currentColor;
+        }
+        50% {
+          opacity: 0.8;
+          box-shadow: 
+            0 0 12px currentColor,
+            0 0 24px currentColor,
+            0 0 36px currentColor;
+        }
       }
       .slider-thumb {
         position: absolute;
@@ -534,30 +704,35 @@ class SonosSimpleVerticalSlider extends LitElement {
         width: 96px;
         height: 72px;
         background:
-          linear-gradient(180deg, #e0e0e0 0%, #bdbdbd 40%, #888 60%, #444 100%),
-          repeating-linear-gradient(135deg, #fff1 0 2px, transparent 2px 8px);
-        border-radius: 8px;
+          linear-gradient(180deg, #f0f0f0 0%, #c0c0c0 30%, #808080 70%, #404040 100%),
+          repeating-linear-gradient(135deg, #fff2 0 2px, transparent 2px 8px),
+          radial-gradient(circle at 30% 30%, #fff3 0%, transparent 50%);
+        border-radius: 12px;
         box-shadow:
-          0 4px 24px #4f8fff55,
-          0 0 0 2px #b48aff,
-          0 4px 16px #000c,
-          0 0 0 2px #23242a;
-        border: 2px solid #444;
+          0 8px 32px #e9456055,
+          0 0 0 2px #e94560,
+          0 8px 24px #000e,
+          0 0 0 1px #23242a,
+          0 4px 16px #0008 inset;
+        border: 2px solid #666;
         z-index: 10;
         cursor: grab;
         display: flex;
         align-items: center;
         justify-content: center;
         transition:
-          box-shadow 0.2s,
+          box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
           bottom 0.25s cubic-bezier(0.4, 2, 0.6, 1),
-          transform 0.15s;
-        backdrop-filter: blur(1.5px) saturate(1.2);
-        -webkit-backdrop-filter: blur(1.5px) saturate(1.2);
+          transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(2px) saturate(1.3);
+        -webkit-backdrop-filter: blur(2px) saturate(1.3);
+        filter: drop-shadow(0 4px 8px #0006);
       }
       .slider-thumb.not-grouped {
         background: linear-gradient(180deg, #bbb 0%, #888 100%);
-        box-shadow: 0 2px 8px #222a, 0 0 0 2px #444a;
+        box-shadow:
+          0 4px 16px #222a,
+          0 0 0 2px #444a;
         border: 2px solid #888;
       }
       .slider-thumb::before {
@@ -569,25 +744,32 @@ class SonosSimpleVerticalSlider extends LitElement {
         top: 32px;
         height: 4px;
         background: linear-gradient(90deg, #fff 0%, #bbb 100%);
-        opacity: 0.7;
-        border-radius: 1px;
+        opacity: 0.8;
+        border-radius: 2px;
+        box-shadow: 0 1px 2px #0004 inset;
       }
       .slider-thumb:active,
       .slider-thumb:hover {
         box-shadow:
-          0 4px 32px #4f8fff88,
-          0 0 0 2px #b48aff,
-          0 4px 16px #000c,
-          0 0 0 2px #23242a;
-        background: linear-gradient(180deg, #fff 0%, #aaa 100%);
-        transform: translate(-50%, 0) scale(1.07);
+          0 12px 48px #e9456088,
+          0 0 0 3px #e94560,
+          0 12px 32px #000e,
+          0 0 0 1px #23242a,
+          0 4px 16px #0008 inset;
+        background:
+          linear-gradient(180deg, #fff 0%, #d0d0d0 30%, #a0a0a0 70%, #606060 100%),
+          repeating-linear-gradient(135deg, #fff2 0 2px, transparent 2px 8px),
+          radial-gradient(circle at 30% 30%, #fff4 0%, transparent 50%);
+        transform: translate(-50%, 0) scale(1.05);
+        filter: drop-shadow(0 8px 16px #0008);
       }
       .slider-track:active .slider-thumb {
         box-shadow:
-          0 4px 32px #4f8fff88,
-          0 0 0 2px #b48aff,
-          0 4px 16px #000c,
-          0 0 0 2px #23242a;
+          0 12px 48px #e9456088,
+          0 0 0 3px #e94560,
+          0 12px 32px #000e,
+          0 0 0 1px #23242a,
+          0 4px 16px #0008 inset;
       }
       .mute-btn:active,
       .group-btn:active {

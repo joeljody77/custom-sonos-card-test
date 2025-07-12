@@ -112,11 +112,13 @@ class PlayerControls extends LitElement {
     return css`
       .main {
         overflow: hidden auto;
+        padding: 16px 0;
       }
       .icons {
         justify-content: center;
         display: flex;
         align-items: center;
+        gap: 8px;
       }
       *[hide] {
         display: none;
@@ -124,6 +126,67 @@ class PlayerControls extends LitElement {
       .big-icon {
         --mdc-icon-button-size: 5rem;
         --mdc-icon-size: 5rem;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .big-icon::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, #e9456022 0%, transparent 70%);
+        border-radius: 50%;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+      .big-icon:hover::before {
+        opacity: 1;
+        animation: buttonPulse 2s ease-in-out infinite;
+      }
+      @keyframes buttonPulse {
+        0%, 100% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 0.3;
+        }
+        50% {
+          transform: translate(-50%, -50%) scale(1.1);
+          opacity: 0.6;
+        }
+      }
+      ha-icon-button {
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 50%;
+        position: relative;
+        overflow: hidden;
+      }
+      ha-icon-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at center, #4f8fff22 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+      }
+      ha-icon-button:hover::before {
+        opacity: 1;
+      }
+      ha-icon-button:hover {
+        transform: scale(1.1);
+        box-shadow: 
+          0 4px 16px #4f8fff44,
+          0 0 0 1px #4f8fff;
+      }
+      ha-icon-button:active {
+        transform: scale(0.95);
+        transition: transform 0.1s;
       }
       .audio-input-format {
         flex: 1 0 0;
@@ -134,7 +197,7 @@ class PlayerControls extends LitElement {
       }
       .audio-input-format > div {
         color: var(--card-background-color);
-        background: var(--disabled-text-color);
+        background: linear-gradient(135deg, #e94560 0%, #4f8fff 100%);
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -144,7 +207,26 @@ class PlayerControls extends LitElement {
         max-width: 100%;
         font-size: smaller;
         line-height: normal;
-        padding: 3px;
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-weight: 600;
+        box-shadow: 
+          0 2px 8px #e9456044,
+          0 0 0 1px #e94560;
+        animation: formatGlow 3s ease-in-out infinite;
+      }
+      @keyframes formatGlow {
+        0%, 100% {
+          box-shadow: 
+            0 2px 8px #e9456044,
+            0 0 0 1px #e94560;
+        }
+        50% {
+          box-shadow: 
+            0 4px 16px #e9456066,
+            0 0 0 1px #e94560,
+            0 0 0 2px #4f8fff44;
+        }
       }
       .flex-1 {
         flex: 1;

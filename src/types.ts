@@ -102,6 +102,16 @@ export interface CardConfig extends LovelaceCardConfig {
   stopInsteadOfPause?: boolean;
   inverseGroupMuteState?: boolean;
   sortFavoritesByType?: boolean;
+  // Enhanced 4K styling options
+  enableAnimatedLights?: boolean;
+  enableVolumePulseEffects?: boolean;
+  enableProgressGlow?: boolean;
+  enableButtonAnimations?: boolean;
+  enableMuteButton?: boolean;
+  enhancedVisualEffects?: boolean;
+  colorScheme?: 'default' | 'vibrant' | 'subtle' | 'custom';
+  customAccentColor?: string;
+  customGlowColor?: string;
 }
 
 export interface MediaArtworkOverride {
